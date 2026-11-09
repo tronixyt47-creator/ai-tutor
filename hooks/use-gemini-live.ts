@@ -83,7 +83,7 @@ export function useGeminiLive() {
     void outputContextRef.current?.close();
   }, []);
 
-  const start = useCallback(async (args: { subject: string; subjectId: string; chapter: string; chapterId: string; topics: string[]; language: string }) => {
+  const start = useCallback(async (args: { subject: string; subjectId: string; chapter: string; chapterId: string; topics: string[]; language: string; apiKey?: string }) => {
     if (state === "connecting" || connected) return;
     const generation = ++generationRef.current;
     intentionalCloseRef.current = false;
@@ -112,7 +112,7 @@ export function useGeminiLive() {
         tokenResult = { token: tokenRef.current, model: modelRef.current ?? undefined };
       } else {
         sessionHandleRef.current = null;
-        const response = await fetch("/api/live-token", { method: "POST", cache: "no-store", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ subjectId: args.subjectId, chapterId: args.chapterId, language: args.language }) });
+        const response = await fetch("/api/live-token", { method: "POST", cache: "no-store", headers: { "Content-Type": "application/json", ...(args.apiKey ? { "x-gemini-api-key": args.apiKey } : {}) }, body: JSON.stringify({ subjectId: args.subjectId, chapterId: args.chapterId, language: args.language }) });
         tokenResult = await response.json() as { token?: string; model?: string; error?: string };
         if (tokenResult.token && tokenResult.model) {
           tokenRef.current = tokenResult.token;

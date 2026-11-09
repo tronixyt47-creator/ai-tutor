@@ -12,10 +12,14 @@ function clientIp(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const visitorGeminiKey = req.headers.get("x-gemini-api-key")?.trim();
+  if (visitorGeminiKey && visitorGeminiKey.length > 512) {
+    return Response.json({ error: "That API key looks too long. Check it and try again." }, { status: 400, headers: { "Cache-Control": "no-store" } });
+  }
   const dedicatedGeminiKey = process.env.GEMINI_API_KEY;
-  const apiKey = dedicatedGeminiKey || process.env.TUTOR_API_KEY;
+  const apiKey = visitorGeminiKey || dedicatedGeminiKey || process.env.TUTOR_API_KEY;
   const apiBase = process.env.TUTOR_API_BASE || "https://generativelanguage.googleapis.com/v1beta/openai";
-  if (!apiKey || (!dedicatedGeminiKey && !apiBase.startsWith("https://generativelanguage.googleapis.com/"))) {
+  if (!apiKey || (!visitorGeminiKey && !dedicatedGeminiKey && !apiBase.startsWith("https://generativelanguage.googleapis.com/"))) {
     return Response.json({ error: "Gemini Live is not configured. Add a Gemini AI Studio key to TUTOR_API_KEY or GEMINI_API_KEY." }, { status: 503, headers: { "Cache-Control": "no-store" } });
   }
   let request: { subjectId?: unknown; chapterId?: unknown; language?: unknown };

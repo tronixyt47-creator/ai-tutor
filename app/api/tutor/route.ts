@@ -7,18 +7,28 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-const MODEL = process.env.TUTOR_MODEL || "glm-4-flash";
+const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai";
+const GEMINI_MODEL = process.env.GEMINI_TUTOR_MODEL || "gemini-3.8-flash";
+const MODEL = process.env.TUTOR_MODEL || GEMINI_MODEL;
 const FALLBACK_MODEL = process.env.TUTOR_FALLBACK_MODEL || "";
 
-function getClient(): OpenAI | null {
-  const apiKey = process.env.TUTOR_API_KEY;
-  if (!apiKey) return null;
-  return new OpenAI({
-    apiKey,
-    baseURL: process.env.TUTOR_API_BASE || "https://api.z.ai/api/paas/v4",
-    timeout: 60_000,
-    maxRetries: 1,
-  });
+function getClient(visitorApiKey: string | null): { client: OpenAI | null; model: string; fallbackModel: string } {
+  const apiKey = visitorApiKey || process.env.TUTOR_API_KEY;
+  if (!apiKey) return { client: null, model: MODEL, fallbackModel: FALLBACK_MODEL };
+
+  // A key entered in Settings is a Gemini AI Studio key. It is used only for
+  // this request and is never written to the server environment or storage.
+  const visitorKey = Boolean(visitorApiKey);
+  return {
+    client: new OpenAI({
+      apiKey,
+      baseURL: visitorKey ? GEMINI_BASE_URL : process.env.TUTOR_API_BASE || GEMINI_BASE_URL,
+      timeout: 60_000,
+      maxRetries: 1,
+    }),
+    model: visitorKey ? GEMINI_MODEL : MODEL,
+    fallbackModel: visitorKey ? process.env.GEMINI_TUTOR_FALLBACK_MODEL || "" : FALLBACK_MODEL,
+  };
 }
 
 function jsonError(message: string, status: number, extraHeaders?: Record<string, string>) {
@@ -77,10 +87,15 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const client = getClient();
+  const visitorApiKey = req.headers.get("x-tutor-api-key")?.trim() || null;
+  if (visitorApiKey && visitorApiKey.length > 512) {
+    return jsonError("That API key looks too long. Check it and try again.", 400);
+  }
+
+  const { client, model, fallbackModel } = getClient(visitorApiKey);
   if (!client) {
     return jsonError(
-      "The tutor isn't connected to an AI model yet. Add TUTOR_API_KEY to ai-tutor/.env.local and restart the server.",
+      "Add a Gemini AI Studio key in Settings to start tutoring.",
       503,
     );
   }
@@ -112,13 +127,13 @@ export async function POST(req: Request) {
   try {
     let upstream: Upstream;
     try {
-      upstream = await startStream({ client, model: MODEL, system, messages, maxTokens, signal: req.signal });
+      upstream = await startStream({ client, model, system, messages, maxTokens, signal: req.signal });
     } catch (error) {
-      if (!FALLBACK_MODEL || req.signal.aborted || !isRetryable(error)) throw error;
-      console.warn(`[tutor] ${MODEL} unavailable, retrying with ${FALLBACK_MODEL}`);
+      if (!fallbackModel || req.signal.aborted || !isRetryable(error)) throw error;
+      console.warn(`[tutor] ${model} unavailable, retrying with ${fallbackModel}`);
       upstream = await startStream({
         client,
-        model: FALLBACK_MODEL,
+        model: fallbackModel,
         system,
         messages,
         maxTokens,
@@ -180,10 +195,7 @@ export async function POST(req: Request) {
       // OpenAI-compatible endpoint) answer 400 with an unreadable body, so keep
       // the wording actionable rather than guessing which field was wrong.
       if (error.status === 401 || error.status === 403) {
-        return jsonError(
-          "The AI provider rejected the API key. Check TUTOR_API_KEY in ai-tutor/.env.local.",
-          502,
-        );
+        return jsonError("The AI provider rejected this key. Check the key in Settings.", 502);
       }
       if (error.status === 400) {
         return jsonError(
@@ -196,7 +208,7 @@ export async function POST(req: Request) {
       }
       if (error.status === 404) {
         return jsonError(
-          `The provider doesn't recognise the model "${MODEL}". Set TUTOR_MODEL to one your key can use.`,
+          `The provider doesn't recognise the model "${model}". Check the model available to this key.`,
           502,
         );
       }
