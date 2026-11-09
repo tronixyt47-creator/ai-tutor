@@ -58,6 +58,66 @@ body {
   animation: blink 1s steps(2, start) infinite;
 }
 
+/* Small lesson diagrams accompany explanations; motion illustrates the idea. */
+.lesson-visual {
+  margin: 0 0 14px;
+  overflow: hidden;
+  border: 1px solid rgba(103, 232, 249, .14);
+  border-radius: 16px;
+  background: linear-gradient(120deg, rgba(9, 30, 48, .78), rgba(10, 17, 34, .72));
+}
+.lesson-visual figcaption {
+  padding: 10px 14px 0;
+  color: rgba(165, 243, 252, .78);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.lesson-visual-stage { min-height: 112px; padding: 3px 10px 10px; }
+.lesson-visual-stage svg { display: block; width: 100%; max-height: 148px; overflow: visible; }
+.lesson-visual-stage svg text { fill: rgba(205, 231, 242, .72); font: 10px Inter, sans-serif; }
+.lesson-wire,.lesson-axis,.lesson-ground { fill: none; stroke: rgba(142, 179, 204, .4); stroke-width: 2; }
+.lesson-flow { fill: none; stroke: #67e8f9; stroke-width: 2.5; stroke-dasharray: 3 12; animation: lesson-dash 1s linear infinite; }
+.lesson-battery path { stroke: #a5f3fc; stroke-width: 3; }
+.lesson-bulb circle { fill: rgba(250, 204, 21, .15); stroke: #fbbf24; stroke-width: 2; animation: lesson-glow 1.8s ease-in-out infinite; }
+.lesson-bulb path { stroke: #fde68a; stroke-width: 2; }
+.lesson-wave { fill: none; stroke: #67e8f9; stroke-width: 3; stroke-dasharray: 470; stroke-dashoffset: 470; animation: lesson-wave-draw 3.6s ease-in-out infinite alternate; }
+.lesson-wave-dot { fill: #cffafe; filter: drop-shadow(0 0 5px #22d3ee); }
+.lesson-axis { stroke-dasharray: 4 5; }
+.lesson-sun { fill: #facc15; filter: drop-shadow(0 0 9px rgba(250,204,21,.48)); animation: lesson-sun-pulse 2.6s ease-in-out infinite; }
+.lesson-ray,.lesson-arrow,.lesson-evaporate,.lesson-rain { fill: none; stroke: #67e8f9; stroke-width: 2; stroke-dasharray: 4 6; animation: lesson-dash 1.5s linear infinite; }
+.lesson-leaf { fill: rgba(52, 211, 153, .28); stroke: #6ee7b7; stroke-width: 2; transform-origin: 214px 76px; animation: lesson-leaf-sway 3s ease-in-out infinite; }
+.lesson-bubble { fill: #a5f3fc; animation: lesson-bubble-rise 2s ease-in-out infinite; }
+.bubble-two { animation-delay: .8s; }
+.lesson-cloud { fill: rgba(186, 230, 253, .14); stroke: #bae6fd; stroke-width: 2; }
+.lesson-water { fill: none; stroke: #38bdf8; stroke-width: 4; animation: lesson-water-wave 2s ease-in-out infinite; }
+.lesson-evaporate { stroke: #fbbf24; }
+.lesson-rain { stroke: #38bdf8; animation-duration: .7s; }
+.lesson-parabola { fill: none; stroke: #a78bfa; stroke-width: 3; stroke-dasharray: 360; stroke-dashoffset: 360; animation: lesson-graph-draw 2.8s ease-in-out infinite alternate; }
+.lesson-root { fill: #67e8f9; filter: drop-shadow(0 0 5px #22d3ee); animation: lesson-root-pulse 1.8s ease-in-out infinite; }
+.root-two { animation-delay: .9s; }
+.lesson-vector { fill: none; stroke: #67e8f9; stroke-width: 2.5; stroke-dasharray: 6 5; animation: lesson-dash 1.2s linear infinite; }
+.vector-second { stroke: #c4b5fd; animation-delay: .3s; }
+.lesson-moving-object { fill: #38bdf8; animation: lesson-move-right 3s ease-in-out infinite alternate; }
+.lesson-moving-object circle { fill: #0f172a; }
+.lesson-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; gap: 8px; min-height: 98px; padding: 14px 4px; }
+.lesson-step { position: relative; display: grid; min-height: 58px; align-content: center; justify-items: center; gap: 7px; border: 1px solid rgba(103, 232, 249, .15); border-radius: 12px; background: rgba(8, 26, 43, .74); text-align: center; animation: lesson-step-glow 2.8s ease-in-out infinite; }
+.lesson-step span { display: grid; width: 20px; height: 20px; place-items: center; border-radius: 50%; background: rgba(34, 211, 238, .16); color: #a5f3fc; font-size: 10px; }
+.lesson-step strong { max-width: 100%; padding: 0 4px; color: rgba(226, 242, 250, .82); font-size: 9px; font-weight: 500; line-height: 1.3; }
+.lesson-step i { position: absolute; right: -12px; z-index: 1; color: #67e8f9; font-size: 14px; font-style: normal; }
+@keyframes lesson-dash { to { stroke-dashoffset: -30; } }
+@keyframes lesson-glow { 50% { fill: rgba(250, 204, 21, .48); filter: drop-shadow(0 0 8px rgba(250,204,21,.6)); } }
+@keyframes lesson-wave-draw { to { stroke-dashoffset: 0; } }
+@keyframes lesson-sun-pulse { 50% { filter: drop-shadow(0 0 14px rgba(250,204,21,.72)); } }
+@keyframes lesson-leaf-sway { 50% { rotate: 4deg; } }
+@keyframes lesson-bubble-rise { 50% { translate: 4px -16px; opacity: .45; } }
+@keyframes lesson-water-wave { 50% { translate: 0 -3px; } }
+@keyframes lesson-graph-draw { to { stroke-dashoffset: 0; } }
+@keyframes lesson-root-pulse { 50% { scale: 1.45; } }
+@keyframes lesson-move-right { to { translate: 190px 0; } }
+@keyframes lesson-step-glow { 0%, 100% { border-color: rgba(103,232,249,.14); } 35% { border-color: rgba(103,232,249,.66); box-shadow: 0 0 20px rgba(34,211,238,.12); } }
+
 @keyframes blink {
   0%,
   100% {
@@ -169,3 +229,4 @@ body {
   .jarvis-orb-caption { font-size:7px; margin-top:5px; }
   .jarvis-orbit { opacity:.8; }
 }
+
