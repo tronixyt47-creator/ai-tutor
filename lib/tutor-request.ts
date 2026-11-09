@@ -6,6 +6,8 @@ export type ChatRole = "user" | "assistant";
 export type ChatMessage = {
   role: ChatRole;
   content: string;
+  /** UI-only metadata; request parsing intentionally strips it before provider calls. */
+  tutorMode?: TutorMode;
 };
 
 export type TutorRequest = {
@@ -90,3 +92,4 @@ export function parseTutorRequest(body: unknown): ParseResult {
     },
   };
 }
+
