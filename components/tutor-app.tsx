@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { FormEvent } from "react";
 import AssistantMode from "./assistant-mode";
 import Markdown from "./markdown";
 import Sidebar from "./sidebar";
@@ -9,6 +10,7 @@ import {
   BookIcon,
   CheckIcon,
   ChevronRightIcon,
+  CloseIcon,
   CopyIcon,
   MenuIcon,
   MicIcon,
@@ -16,6 +18,7 @@ import {
   SendIcon,
   SparklesIcon,
   SpeakerIcon,
+  SettingsIcon,
   StopIcon,
 } from "./icons";
 import { useDictation } from "@/hooks/use-voice";
@@ -28,6 +31,7 @@ import type { ChatMessage } from "@/lib/tutor-request";
 import { useGeminiLive } from "@/hooks/use-gemini-live";
 
 const STORAGE_KEY = "vidya.session.v1";
+const API_KEY_STORAGE = "vidya.gemini-key.session.v1";
 
 type Sessions = Record<string, ChatMessage[]>;
 type Status = "idle" | "streaming";
@@ -51,6 +55,10 @@ export default function TutorApp() {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [ai, setAi] = useState<AiInfo | null>(null);
+  const [apiKey, setApiKey] = useState("");
+  const [apiKeyDraft, setApiKeyDraft] = useState("");
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [showApiKey, setShowApiKey] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [speakingKey, setSpeakingKey] = useState<string | null>(null);
@@ -88,6 +96,7 @@ export default function TutorApp() {
   const voiceOut = useVoiceOut({ language, voice, onEnded: handleSpeechEnded });
 
   const live = useGeminiLive();
+  const aiConfigured = Boolean(ai?.configured || apiKey);
   const canSpeak = voiceOut.browserSupported || (voiceCatalog?.provider ?? null) !== null;
 
   /** After the tutor finishes speaking in voice mode, hand the mic back. */
@@ -98,6 +107,11 @@ export default function TutorApp() {
 
   // Restore the previous session, then ask the server whether a key is configured.
   useEffect(() => {
+    try {
+      setApiKey(window.sessionStorage.getItem(API_KEY_STORAGE) ?? "");
+    } catch {
+      // Session storage can be unavailable in strict private browsing modes.
+    }
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
@@ -250,6 +264,44 @@ export default function TutorApp() {
     setError(null);
   }
 
+  function openSettings() {
+    setApiKeyDraft(apiKey);
+    setShowApiKey(false);
+    setSettingsOpen(true);
+  }
+
+  function saveApiKey(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const nextKey = apiKeyDraft.trim();
+    if (!nextKey) {
+      setError("Paste your Gemini AI Studio API key first.");
+      return;
+    }
+    try {
+      window.sessionStorage.setItem(API_KEY_STORAGE, nextKey);
+    } catch {
+      setError("This browser blocked session storage. Check its privacy settings and try again.");
+      return;
+    }
+    live.close();
+    setApiKey(nextKey);
+    setApiKeyDraft("");
+    setSettingsOpen(false);
+    setError(null);
+  }
+
+  function removeApiKey() {
+    try {
+      window.sessionStorage.removeItem(API_KEY_STORAGE);
+    } catch {
+      // The in-memory copy is still cleared if storage is unavailable.
+    }
+    live.close();
+    setApiKey("");
+    setApiKeyDraft("");
+    setSettingsOpen(false);
+  }
+
   function closeAssistant() {
     assistantOpenRef.current = false;
     setAssistantOpen(false);
@@ -260,7 +312,7 @@ export default function TutorApp() {
 
   /** The orb: interrupt speech, stop dictation, or start talking. */
   function handleOrbTap() {
-    if (!live.connected) void live.start({ subject: subject.name, subjectId: subject.id, chapter: chapter.name, chapterId: chapter.id, topics: chapter.topics, language });
+    if (!live.connected) void live.start({ subject: subject.name, subjectId: subject.id, chapter: chapter.name, chapterId: chapter.id, topics: chapter.topics, language, apiKey });
     else live.interrupt();
   }
 
@@ -294,7 +346,7 @@ export default function TutorApp() {
     try {
       const res = await fetch("/api/tutor", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(apiKey ? { "x-tutor-api-key": apiKey } : {}) },
         body: JSON.stringify({ subjectId, chapterId, mode, language, messages: history, assistant: assistantTurn }),
         signal: controller.signal,
       });
@@ -507,6 +559,17 @@ export default function TutorApp() {
 
               <button
                 type="button"
+                onClick={openSettings}
+                aria-label="Settings and API key"
+                title="Settings and API key"
+                className="flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-white/[0.08] px-2.5 text-[12px] text-mist-300 transition hover:border-white/20 hover:text-white"
+              >
+                <SettingsIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">Settings</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={openAssistant}
                 aria-label="Talk to JARVIS"
                 title="Voice mode — talk to JARVIS"
@@ -550,10 +613,10 @@ export default function TutorApp() {
               <span className="ml-auto hidden shrink-0 items-center gap-1.5 pl-3 text-[10.5px] text-mist-500 sm:flex">
                 <span
                   className={`h-1.5 w-1.5 rounded-full ${
-                    ai?.configured ? "bg-mint-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" : "bg-amber-400"
+                    aiConfigured ? "bg-mint-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" : "bg-amber-400"
                   }`}
                 />
-                {ai?.configured ? ai.model || "AI ready" : ai ? "No API key" : "Connecting…"}
+                {aiConfigured ? (apiKey ? "Gemini ready" : ai?.model || "AI ready") : ai ? "Add API key" : "Connecting…"}
               </span>
             </div>
           </div>
@@ -694,13 +757,11 @@ export default function TutorApp() {
 
         <div className="border-t border-white/[0.07] bg-ink-950/60 backdrop-blur-xl">
           <div className="mx-auto w-full max-w-3xl px-3 py-3 sm:px-5 lg:px-8">
-            {ai && !ai.configured ? (
+            {ai && !aiConfigured ? (
               <div className="mb-2 flex items-start gap-2 rounded-xl border border-amber-400/25 bg-amber-400/10 px-3 py-2 text-[11.5px] leading-relaxed text-amber-100">
                 <AlertIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-300" />
-                <p>
-                  No AI key yet. Add <code className="rounded bg-black/30 px-1">TUTOR_API_KEY</code> to{" "}
-                  <code className="rounded bg-black/30 px-1">ai-tutor/.env.local</code> and restart the dev server.
-                </p>
+                <p className="flex-1">No AI key yet. Add your Gemini AI Studio key in Settings to start tutoring.</p>
+                <button type="button" onClick={openSettings} className="shrink-0 font-medium text-amber-200 underline decoration-amber-200/40 underline-offset-2 hover:text-white">Open Settings</button>
               </div>
             ) : null}
 
@@ -816,6 +877,44 @@ export default function TutorApp() {
           </div>
         </div>
       </main>
+
+      {settingsOpen ? (
+        <div className="fixed inset-0 z-[70] grid place-items-center bg-black/70 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSettingsOpen(false); }}>
+          <section role="dialog" aria-modal="true" aria-labelledby="settings-title" className="w-full max-w-md rounded-2xl border border-white/10 bg-ink-900 p-5 shadow-2xl sm:p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-accent-300">Personal setup</p>
+                <h2 id="settings-title" className="mt-1 font-display text-lg font-semibold text-white">Settings</h2>
+              </div>
+              <button type="button" onClick={() => setSettingsOpen(false)} aria-label="Close settings" className="grid h-8 w-8 place-items-center rounded-lg text-mist-400 hover:bg-white/[0.06] hover:text-white"><CloseIcon /></button>
+            </div>
+
+            <form onSubmit={saveApiKey} className="mt-5">
+              <label htmlFor="gemini-api-key" className="text-[12px] font-medium text-mist-200">Gemini AI Studio API key</label>
+              <div className="mt-2 flex gap-2">
+                <input
+                  id="gemini-api-key"
+                  type={showApiKey ? "text" : "password"}
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  value={apiKeyDraft}
+                  onChange={(event) => setApiKeyDraft(event.target.value)}
+                  placeholder={apiKey ? "Saved for this tab — enter a replacement" : "Paste your Gemini API key"}
+                  className="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/25 px-3 py-2.5 text-[13px] text-white outline-none placeholder:text-mist-600 focus:border-accent-400/50 focus:ring-1 focus:ring-accent-400/20"
+                />
+                <button type="button" onClick={() => setShowApiKey((show) => !show)} className="rounded-xl border border-white/10 px-3 text-[11px] text-mist-300 hover:text-white">{showApiKey ? "Hide" : "Show"}</button>
+              </div>
+              <p className="mt-2 text-[11px] leading-relaxed text-mist-500">The key stays in this browser tab’s session storage and is sent to Vidya only when you use chat or voice. It is not saved to the site or Vercel. Close the tab to clear it.</p>
+              <p className="mt-2 text-[11px] leading-relaxed text-mist-500">Get a key from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" className="text-accent-300 underline underline-offset-2 hover:text-white">Google AI Studio</a>. Google account usage and billing apply.</p>
+              <div className="mt-5 flex items-center justify-between gap-3">
+                {apiKey ? <button type="button" onClick={removeApiKey} className="text-[12px] text-rose-300 hover:text-rose-200">Remove saved key</button> : <span className="text-[11px] text-mist-600">No key saved in this tab</span>}
+                <button type="submit" disabled={!apiKeyDraft.trim()} className="rounded-xl bg-gradient-to-r from-accent-500 to-accent-600 px-4 py-2 text-[12px] font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40">Save for this tab</button>
+              </div>
+            </form>
+          </section>
+        </div>
+      ) : null}
 
       <AssistantMode
         open={assistantOpen}
