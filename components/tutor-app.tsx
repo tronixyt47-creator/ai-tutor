@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import AssistantMode from "./assistant-mode";
+import LessonVisual from "./lesson-visual";
 import Markdown from "./markdown";
 import Sidebar from "./sidebar";
 import {
@@ -697,11 +698,19 @@ export default function TutorApp() {
                       </span>
                       <div className="min-w-0 flex-1">
                         {message.content ? (
+                          <>
+                          {mode === "explain" ? (
+                            <LessonVisual
+                              chapter={chapter}
+                              prompt={messages.slice(0, index).reverse().find((item) => item.role === "user")?.content ?? chapter.name}
+                            />
+                          ) : null}
                           <Markdown>
                             {status === "streaming" && index === messages.length - 1
                               ? `${message.content} ▍`
                               : message.content}
                           </Markdown>
+                          </>
                         ) : (
                           <p className="flex items-center gap-1.5 py-1 text-[13px] text-mist-400">
                             <span className="h-1.5 w-1.5 animate-blink rounded-full bg-accent-300" />
