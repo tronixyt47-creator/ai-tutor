@@ -31,7 +31,8 @@ import type { ChatMessage } from "@/lib/tutor-request";
 import { useGeminiLive } from "@/hooks/use-gemini-live";
 
 const STORAGE_KEY = "vidya.session.v1";
-const API_KEY_STORAGE = "vidya.gemini-key.session.v1";
+const API_KEY_STORAGE = "vidya.gemini-key.v1";
+const LEGACY_API_KEY_STORAGE = "vidya.gemini-key.session.v1";
 
 type Sessions = Record<string, ChatMessage[]>;
 type Status = "idle" | "streaming";
@@ -105,10 +106,17 @@ export default function TutorApp() {
     if (handsFree) dictation.start();
   }
 
-  // Restore the previous session, then ask the server whether a key is configured.
+  // Restore the saved API key and previous session, then ask the server whether
+  // a server-side key is configured. Migrate keys saved by the older tab-only UI.
   useEffect(() => {
     try {
-      setApiKey(window.sessionStorage.getItem(API_KEY_STORAGE) ?? "");
+      let savedKey = window.localStorage.getItem(API_KEY_STORAGE);
+      if (!savedKey) {
+        savedKey = window.sessionStorage.getItem(LEGACY_API_KEY_STORAGE);
+        if (savedKey) window.localStorage.setItem(API_KEY_STORAGE, savedKey);
+      }
+      window.sessionStorage.removeItem(LEGACY_API_KEY_STORAGE);
+      setApiKey(savedKey ?? "");
     } catch {
       // Session storage can be unavailable in strict private browsing modes.
     }
@@ -278,9 +286,9 @@ export default function TutorApp() {
       return;
     }
     try {
-      window.sessionStorage.setItem(API_KEY_STORAGE, nextKey);
+      window.localStorage.setItem(API_KEY_STORAGE, nextKey);
     } catch {
-      setError("This browser blocked session storage. Check its privacy settings and try again.");
+      setError("This browser blocked local storage. Check its privacy settings and try again.");
       return;
     }
     live.close();
@@ -292,7 +300,8 @@ export default function TutorApp() {
 
   function removeApiKey() {
     try {
-      window.sessionStorage.removeItem(API_KEY_STORAGE);
+      window.localStorage.removeItem(API_KEY_STORAGE);
+      window.sessionStorage.removeItem(LEGACY_API_KEY_STORAGE);
     } catch {
       // The in-memory copy is still cleared if storage is unavailable.
     }
@@ -900,16 +909,16 @@ export default function TutorApp() {
                   spellCheck={false}
                   value={apiKeyDraft}
                   onChange={(event) => setApiKeyDraft(event.target.value)}
-                  placeholder={apiKey ? "Saved for this tab — enter a replacement" : "Paste your Gemini API key"}
+                  placeholder={apiKey ? "Saved on this device — enter a replacement" : "Paste your Gemini API key"}
                   className="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/25 px-3 py-2.5 text-[13px] text-white outline-none placeholder:text-mist-600 focus:border-accent-400/50 focus:ring-1 focus:ring-accent-400/20"
                 />
                 <button type="button" onClick={() => setShowApiKey((show) => !show)} className="rounded-xl border border-white/10 px-3 text-[11px] text-mist-300 hover:text-white">{showApiKey ? "Hide" : "Show"}</button>
               </div>
-              <p className="mt-2 text-[11px] leading-relaxed text-mist-500">The key stays in this browser tab’s session storage and is sent to Vidya only when you use chat or voice. It is not saved to the site or Vercel. Close the tab to clear it.</p>
+              <p className="mt-2 text-[11px] leading-relaxed text-mist-500">The key is saved in this browser on this device, so it stays available after you close the tab. It is sent to Vidya only when you use chat or voice; it is not saved on the site or Vercel. Remove it here to clear it.</p>
               <p className="mt-2 text-[11px] leading-relaxed text-mist-500">Get a key from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" className="text-accent-300 underline underline-offset-2 hover:text-white">Google AI Studio</a>. Google account usage and billing apply.</p>
               <div className="mt-5 flex items-center justify-between gap-3">
-                {apiKey ? <button type="button" onClick={removeApiKey} className="text-[12px] text-rose-300 hover:text-rose-200">Remove saved key</button> : <span className="text-[11px] text-mist-600">No key saved in this tab</span>}
-                <button type="submit" disabled={!apiKeyDraft.trim()} className="rounded-xl bg-gradient-to-r from-accent-500 to-accent-600 px-4 py-2 text-[12px] font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40">Save for this tab</button>
+                {apiKey ? <button type="button" onClick={removeApiKey} className="text-[12px] text-rose-300 hover:text-rose-200">Remove saved key</button> : <span className="text-[11px] text-mist-600">No key saved on this device</span>}
+                <button type="submit" disabled={!apiKeyDraft.trim()} className="rounded-xl bg-gradient-to-r from-accent-500 to-accent-600 px-4 py-2 text-[12px] font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40">Save on this device</button>
               </div>
             </form>
           </section>
@@ -942,3 +951,4 @@ export default function TutorApp() {
     </div>
   );
 }
+
