@@ -340,6 +340,7 @@ export default function TutorApp() {
     const text = (override ?? input).trim();
     if (!text || status === "streaming") return;
 
+    const turnMode = mode;
     const assistantTurn = options?.assistant === true;
     const key = sessionKey;
     const history: ChatMessage[] = [...(sessions[key] ?? []), { role: "user", content: text }];
@@ -347,7 +348,7 @@ export default function TutorApp() {
     setInput("");
     setError(null);
     voiceOut.stop();
-    withSession(key, () => [...history, { role: "assistant", content: "" }]);
+    withSession(key, () => [...history, { role: "assistant", content: "", tutorMode: turnMode }]);
     setStatus("streaming");
 
     const controller = new AbortController();
@@ -357,7 +358,7 @@ export default function TutorApp() {
       const res = await fetch("/api/tutor", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...(apiKey ? { "x-tutor-api-key": apiKey } : {}) },
-        body: JSON.stringify({ subjectId, chapterId, mode, language, messages: history, assistant: assistantTurn }),
+        body: JSON.stringify({ subjectId, chapterId, mode: turnMode, language, messages: history, assistant: assistantTurn }),
         signal: controller.signal,
       });
 
@@ -414,7 +415,7 @@ export default function TutorApp() {
         answer += decoder.decode(value, { stream: true });
         const snapshot = answer;
         withSession(key, (prev) =>
-          prev.length ? [...prev.slice(0, -1), { role: "assistant", content: snapshot }] : prev,
+          prev.length ? [...prev.slice(0, -1), { role: "assistant", content: snapshot, tutorMode: turnMode }] : prev,
         );
         flushSpeech(snapshot, false);
       }
@@ -699,7 +700,7 @@ export default function TutorApp() {
                       <div className="min-w-0 flex-1">
                         {message.content ? (
                           <>
-                          {mode === "explain" ? (
+                          {(message.tutorMode ?? mode) === "explain" ? (
                             <LessonVisual
                               chapter={chapter}
                               prompt={messages.slice(0, index).reverse().find((item) => item.role === "user")?.content ?? chapter.name}
@@ -760,7 +761,7 @@ export default function TutorApp() {
                               </button>
                             ) : null}
                             <span className="text-[10.5px] text-mist-500">
-                              {modeMeta.label} · {chapter.name}
+                              {findMode(message.tutorMode ?? mode).label} · {chapter.name}
                             </span>
                           </div>
                         ) : null}
