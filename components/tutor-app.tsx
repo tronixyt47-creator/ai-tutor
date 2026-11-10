@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import AssistantMode from "./assistant-mode";
+import PastPapers from "./past-papers";
 import LessonVisual from "./lesson-visual";
 import Markdown from "./markdown";
 import Sidebar from "./sidebar";
@@ -73,6 +74,7 @@ export default function TutorApp() {
   } | null>(null);
   const [handsFree, setHandsFree] = useState(true);
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const [pastPapersOpen, setPastPapersOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   const abortRef = useRef<AbortController | null>(null);
@@ -570,6 +572,17 @@ export default function TutorApp() {
 
               <button
                 type="button"
+                onClick={() => setPastPapersOpen(true)}
+                aria-label="Open previous year papers"
+                title="CBSE Class 10 previous year papers"
+                className="flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-white/[0.08] px-2.5 text-[12px] text-mist-300 transition hover:border-white/20 hover:text-white"
+              >
+                <BookIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">PYQs</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={openSettings}
                 aria-label="Settings and API key"
                 title="Settings and API key"
@@ -896,6 +909,7 @@ export default function TutorApp() {
           </div>
         </div>
       </main>
+      {pastPapersOpen ? <PastPapers subject={subject.name} onClose={() => setPastPapersOpen(false)} /> : null}
 
       {settingsOpen ? (
         <div className="fixed inset-0 z-[70] grid place-items-center bg-black/70 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSettingsOpen(false); }}>
@@ -961,4 +975,3 @@ export default function TutorApp() {
     </div>
   );
 }
-
