@@ -14,14 +14,14 @@ body {
 }
 
 body {
-  background-color: #060912;
-  color: #e8ecf8;
+  background-color: #304656;
+  color: #f1f0de;
   font-family: "Inter", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   background-image:
-    radial-gradient(900px 500px at 12% -10%, rgba(139, 92, 246, 0.18), transparent 60%),
-    radial-gradient(800px 480px at 92% 0%, rgba(16, 185, 129, 0.12), transparent 62%),
-    radial-gradient(700px 600px at 50% 120%, rgba(99, 102, 241, 0.12), transparent 65%);
+    radial-gradient(900px 500px at 12% -10%, rgba(166, 182, 168, 0.2), transparent 60%),
+    radial-gradient(800px 480px at 92% 0%, rgba(190, 205, 176, 0.13), transparent 62%),
+    radial-gradient(700px 600px at 50% 120%, rgba(93, 120, 142, 0.22), transparent 65%);
   background-attachment: fixed;
 }
 
@@ -43,7 +43,7 @@ body {
 }
 
 ::selection {
-  background: rgba(139, 92, 246, 0.4);
+  background: rgba(166, 182, 168, 0.42);
 }
 
 /* Streaming caret */
@@ -54,7 +54,7 @@ body {
   height: 1.05em;
   margin-left: 2px;
   translate: 0 2px;
-  background: #a78bfa;
+  background: #becdb0;
   animation: blink 1s steps(2, start) infinite;
 }
 
@@ -62,7 +62,7 @@ body {
 .lesson-visual {
   margin: 0 0 14px;
   overflow: hidden;
-  border: 1px solid rgba(103, 232, 249, .14);
+  border: 1px solid rgba(166, 182, 168, .24);
   border-radius: 16px;
   background: linear-gradient(120deg, rgba(9, 30, 48, .78), rgba(10, 17, 34, .72));
 }
@@ -78,34 +78,34 @@ body {
 .lesson-visual-stage svg { display: block; width: 100%; max-height: 148px; overflow: visible; }
 .lesson-visual-stage svg text { fill: rgba(205, 231, 242, .72); font: 10px Inter, sans-serif; }
 .lesson-wire,.lesson-axis,.lesson-ground { fill: none; stroke: rgba(142, 179, 204, .4); stroke-width: 2; }
-.lesson-flow { fill: none; stroke: #67e8f9; stroke-width: 2.5; stroke-dasharray: 3 12; animation: lesson-dash 1s linear infinite; }
-.lesson-battery path { stroke: #a5f3fc; stroke-width: 3; }
+.lesson-flow { fill: none; stroke: #a6b6a8; stroke-width: 2.5; stroke-dasharray: 3 12; animation: lesson-dash 1s linear infinite; }
+.lesson-battery path { stroke: #dce4d2; stroke-width: 3; }
 .lesson-bulb circle { fill: rgba(250, 204, 21, .15); stroke: #fbbf24; stroke-width: 2; animation: lesson-glow 1.8s ease-in-out infinite; }
 .lesson-bulb path { stroke: #fde68a; stroke-width: 2; }
-.lesson-wave { fill: none; stroke: #67e8f9; stroke-width: 3; stroke-dasharray: 470; stroke-dashoffset: 470; animation: lesson-wave-draw 3.6s ease-in-out infinite alternate; }
-.lesson-wave-dot { fill: #cffafe; filter: drop-shadow(0 0 5px #22d3ee); }
+.lesson-wave { fill: none; stroke: #a6b6a8; stroke-width: 3; stroke-dasharray: 470; stroke-dashoffset: 470; animation: lesson-wave-draw 3.6s ease-in-out infinite alternate; }
+.lesson-wave-dot { fill: #f1f0de; filter: drop-shadow(0 0 5px #a6b6a8); }
 .lesson-axis { stroke-dasharray: 4 5; }
 .lesson-sun { fill: #facc15; filter: drop-shadow(0 0 9px rgba(250,204,21,.48)); animation: lesson-sun-pulse 2.6s ease-in-out infinite; }
-.lesson-ray,.lesson-arrow,.lesson-evaporate,.lesson-rain { fill: none; stroke: #67e8f9; stroke-width: 2; stroke-dasharray: 4 6; animation: lesson-dash 1.5s linear infinite; }
+.lesson-ray,.lesson-arrow,.lesson-evaporate,.lesson-rain { fill: none; stroke: #a6b6a8; stroke-width: 2; stroke-dasharray: 4 6; animation: lesson-dash 1.5s linear infinite; }
 .lesson-leaf { fill: rgba(52, 211, 153, .28); stroke: #6ee7b7; stroke-width: 2; transform-origin: 214px 76px; animation: lesson-leaf-sway 3s ease-in-out infinite; }
-.lesson-bubble { fill: #a5f3fc; animation: lesson-bubble-rise 2s ease-in-out infinite; }
+.lesson-bubble { fill: #dce4d2; animation: lesson-bubble-rise 2s ease-in-out infinite; }
 .bubble-two { animation-delay: .8s; }
 .lesson-cloud { fill: rgba(186, 230, 253, .14); stroke: #bae6fd; stroke-width: 2; }
 .lesson-water { fill: none; stroke: #38bdf8; stroke-width: 4; animation: lesson-water-wave 2s ease-in-out infinite; }
 .lesson-evaporate { stroke: #fbbf24; }
 .lesson-rain { stroke: #38bdf8; animation-duration: .7s; }
-.lesson-parabola { fill: none; stroke: #a78bfa; stroke-width: 3; stroke-dasharray: 360; stroke-dashoffset: 360; animation: lesson-graph-draw 2.8s ease-in-out infinite alternate; }
-.lesson-root { fill: #67e8f9; filter: drop-shadow(0 0 5px #22d3ee); animation: lesson-root-pulse 1.8s ease-in-out infinite; }
+.lesson-parabola { fill: none; stroke: #a6b6a8; stroke-width: 3; stroke-dasharray: 360; stroke-dashoffset: 360; animation: lesson-graph-draw 2.8s ease-in-out infinite alternate; }
+.lesson-root { fill: #becdb0; filter: drop-shadow(0 0 5px #8d9f86); animation: lesson-root-pulse 1.8s ease-in-out infinite; }
 .root-two { animation-delay: .9s; }
-.lesson-vector { fill: none; stroke: #67e8f9; stroke-width: 2.5; stroke-dasharray: 6 5; animation: lesson-dash 1.2s linear infinite; }
-.vector-second { stroke: #c4b5fd; animation-delay: .3s; }
+.lesson-vector { fill: none; stroke: #a6b6a8; stroke-width: 2.5; stroke-dasharray: 6 5; animation: lesson-dash 1.2s linear infinite; }
+.vector-second { stroke: #d8dfc8; animation-delay: .3s; }
 .lesson-moving-object { fill: #38bdf8; animation: lesson-move-right 3s ease-in-out infinite alternate; }
 .lesson-moving-object circle { fill: #0f172a; }
 .lesson-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; gap: 8px; min-height: 98px; padding: 14px 4px; }
-.lesson-step { position: relative; display: grid; min-height: 58px; align-content: center; justify-items: center; gap: 7px; border: 1px solid rgba(103, 232, 249, .15); border-radius: 12px; background: rgba(8, 26, 43, .74); text-align: center; animation: lesson-step-glow 2.8s ease-in-out infinite; }
-.lesson-step span { display: grid; width: 20px; height: 20px; place-items: center; border-radius: 50%; background: rgba(34, 211, 238, .16); color: #a5f3fc; font-size: 10px; }
+.lesson-step { position: relative; display: grid; min-height: 58px; align-content: center; justify-items: center; gap: 7px; border: 1px solid rgba(166, 182, 168, .2); border-radius: 12px; background: rgba(48, 70, 86, .74); text-align: center; animation: lesson-step-glow 2.8s ease-in-out infinite; }
+.lesson-step span { display: grid; width: 20px; height: 20px; place-items: center; border-radius: 50%; background: rgba(166, 182, 168, .18); color: #dce4d2; font-size: 10px; }
 .lesson-step strong { max-width: 100%; padding: 0 4px; color: rgba(226, 242, 250, .82); font-size: 9px; font-weight: 500; line-height: 1.3; }
-.lesson-step i { position: absolute; right: -12px; z-index: 1; color: #67e8f9; font-size: 14px; font-style: normal; }
+.lesson-step i { position: absolute; right: -12px; z-index: 1; color: #becdb0; font-size: 14px; font-style: normal; }
 @keyframes lesson-dash { to { stroke-dashoffset: -30; } }
 @keyframes lesson-glow { 50% { fill: rgba(250, 204, 21, .48); filter: drop-shadow(0 0 8px rgba(250,204,21,.6)); } }
 @keyframes lesson-wave-draw { to { stroke-dashoffset: 0; } }
@@ -116,7 +116,7 @@ body {
 @keyframes lesson-graph-draw { to { stroke-dashoffset: 0; } }
 @keyframes lesson-root-pulse { 50% { scale: 1.45; } }
 @keyframes lesson-move-right { to { translate: 190px 0; } }
-@keyframes lesson-step-glow { 0%, 100% { border-color: rgba(103,232,249,.14); } 35% { border-color: rgba(103,232,249,.66); box-shadow: 0 0 20px rgba(34,211,238,.12); } }
+@keyframes lesson-step-glow { 0%, 100% { border-color: rgba(166,182,168,.16); } 35% { border-color: rgba(190,205,176,.62); box-shadow: 0 0 20px rgba(166,182,168,.14); } }
 
 @keyframes blink {
   0%,
@@ -171,7 +171,7 @@ body {
   background-size: 48px 48px;
   mask-image: radial-gradient(ellipse at center, black 10%, transparent 78%);
 }
-.jarvis-mark { display:grid; place-items:center; width:34px; height:34px; border:1px solid rgba(89,223,255,.36); border-radius:11px; color:#a5f3fc; font:600 15px Sora,sans-serif; background:linear-gradient(145deg,rgba(28,124,173,.2),rgba(6,20,38,.8)); box-shadow:0 0 24px rgba(34,211,238,.12),inset 0 0 14px rgba(34,211,238,.08); }
+.jarvis-mark { display:grid; place-items:center; width:34px; height:34px; border:1px solid rgba(166,182,168,.4); border-radius:11px; color:#dce4d2; font:600 15px Sora,sans-serif; background:linear-gradient(145deg,rgba(93,120,142,.32),rgba(48,70,86,.8)); box-shadow:0 0 24px rgba(166,182,168,.14),inset 0 0 14px rgba(166,182,168,.1); }
 .jarvis-icon-button { display:flex; align-items:center; justify-content:center; gap:7px; width:36px; height:36px; border:1px solid rgba(190,220,245,.13); border-radius:11px; color:#b8cbd9; background:rgba(10,22,37,.66); transition:border-color .2s,color .2s,background .2s; }
 .jarvis-icon-button:hover { color:#ecfeff; border-color:rgba(103,232,249,.38); background:rgba(8,44,62,.64); }
 .jarvis-icon-button:disabled { opacity:.38; }
@@ -193,12 +193,12 @@ body {
 .orbit-one { inset:4%; animation:jarvis-spin 24s linear infinite; }
 .orbit-two { inset:12%; transform:rotate(58deg) scaleY(.54); border-color:rgba(81,205,239,.13); animation:jarvis-spin 31s linear infinite reverse; }
 .orbit-three { inset:-4%; transform:rotate(18deg) scaleY(.68); border-color:rgba(81,205,239,.1); animation:jarvis-spin 40s linear infinite; }
-.jarvis-orb-core { position:relative; z-index:1; display:flex; width:64%; height:64%; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; border:1px solid rgba(146,244,255,.72); border-radius:50%; background:radial-gradient(circle at 33% 25%,rgba(181,252,255,.98) 0%,#39c5ee 9%,#0874b3 34%,#07335d 68%,#06162e 100%); box-shadow:0 0 calc(42px + var(--audio-level,0)*58px) rgba(27,182,240,.38),inset -12px -18px 42px rgba(1,10,32,.72),inset 8px 7px 30px rgba(223,255,255,.3); animation:jarvis-float 5s ease-in-out infinite,jarvis-breathe 4.3s ease-in-out infinite; transition:transform .12s ease-out,box-shadow .12s ease-out; transform:scale(calc(1 + var(--audio-level,0)*.07)); }
+.jarvis-orb-core { position:relative; z-index:1; display:flex; width:64%; height:64%; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; border:1px solid rgba(241,240,222,.68); border-radius:50%; background:radial-gradient(circle at 33% 25%,rgba(241,240,222,.96) 0%,#becdb0 12%,#8d9f86 34%,#5d788e 68%,#304656 100%); box-shadow:0 0 calc(42px + var(--audio-level,0)*58px) rgba(166,182,168,.38),inset -12px -18px 42px rgba(25,39,48,.62),inset 8px 7px 30px rgba(241,240,222,.28); animation:jarvis-float 5s ease-in-out infinite,jarvis-breathe 4.3s ease-in-out infinite; transition:transform .12s ease-out,box-shadow .12s ease-out; transform:scale(calc(1 + var(--audio-level,0)*.07)); }
 .jarvis-orb-halo { position:absolute; width:70%; height:70%; border-radius:50%; background:rgba(27,193,255,.13); filter:blur(32px); transform:scale(calc(1 + var(--audio-level,0)*.26)); transition:transform .12s,opacity .2s; }
 .jarvis-orb-shine { position:absolute; inset:8% 18% 42% 12%; border-radius:50%; background:linear-gradient(135deg,rgba(255,255,255,.56),rgba(255,255,255,0)); filter:blur(10px); transform:rotate(-28deg); }
 .jarvis-orb-symbol { position:relative; color:rgba(226,252,255,.94); font:300 clamp(35px,6vw,54px)/1 Sora,sans-serif; text-shadow:0 0 22px rgba(255,255,255,.55); }
 .jarvis-orb-caption { margin-top:8px; color:rgba(205,249,255,.62); font-size:8px; letter-spacing:.25em; }
-.jarvis-orb-particle { position:absolute; z-index:2; width:4px; height:4px; border-radius:50%; background:#a5f3fc; box-shadow:0 0 12px #67e8f9; }
+.jarvis-orb-particle { position:absolute; z-index:2; width:4px; height:4px; border-radius:50%; background:#f1f0de; box-shadow:0 0 12px #becdb0; }
 .particle-a { top:15%; left:25%; animation:jarvis-drift 5s ease-in-out infinite; }.particle-b { right:17%; top:39%; width:3px;height:3px;animation:jarvis-drift 6s ease-in-out -2s infinite; }.particle-c { left:27%;bottom:16%;width:2px;height:2px;animation:jarvis-drift 7s ease-in-out -4s infinite; }
 .state-listening .jarvis-orbit,.state-speaking .jarvis-orbit { border-color:rgba(92,232,255,.48); }
 .state-listening .orbit-three,.state-speaking .orbit-three { animation-duration:12s; }
@@ -229,4 +229,3 @@ body {
   .jarvis-orb-caption { font-size:7px; margin-top:5px; }
   .jarvis-orbit { opacity:.8; }
 }
-
